@@ -9,6 +9,7 @@ import org.scalatest._
 
 import TweetLength.MaxTweetLength
 import Signal._
+import Calculator._
 
 @RunWith(classOf[JUnitRunner])
 class CalculatorSuite extends FunSuite with ShouldMatchers {
@@ -74,5 +75,35 @@ class CalculatorSuite extends FunSuite with ShouldMatchers {
     assert(result3() == Set(-1))
   }
 
+  val references: Map[String, Signal[Expr]] = Map(
+    "a" -> Signal(Literal(7)),
+    "b" -> Signal(Plus(Literal(4), Literal(3))),
+    "c" -> Signal(Plus(Ref("a"), Literal(1)))
+  )
+
+  test("Evaluate literal") {
+    assert(eval(Literal(1), Map()) === 1)
+  }
+
+  test("Evaluate Minus") {
+    assert(eval(Minus(Literal(3), Literal(2)), Map()) === 1)
+  }
+
+  test("Evaluate reference to literal") {
+    assert(eval(Ref("a"), references) === 7)
+  }
+
+  test("Evaluate refererence to formula") {
+    assert(eval(Ref("b"), references) === 7)
+  }
+
+  test("Evaluate variable NaN") {
+    assert(eval(Ref("z"), references).isNaN)
+  }
+
+  test("Evaluate  circular dependencies") {
+    val circularReferences: Map[String, Signal[Expr]] = Map("a" -> Signal(Ref("b")), "b" -> Signal(Ref("a")))
+    assert(eval(Ref("a"), circularReferences).isNaN)
+  }
 
 }
