@@ -1,6 +1,6 @@
 package calculator
 
-object TweetLength {
+object  TweetLength {
   final val MaxTweetLength = 140
 
   def tweetRemainingCharsCount(tweetText: Signal[String]): Signal[Int] = {
